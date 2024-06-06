@@ -1,1 +1,1 @@
-web: gunicorn mspilot_b.wsgi --log-file -
+web: gunicorn mspilot.wsgi --log-file -
