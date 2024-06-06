@@ -12,7 +12,7 @@ WORKDIR /code
 COPY requirements.txt /code/
 
 # Install dependencies using pip directly from the requirements.txt file
-#RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Copy the rest of your application's code from your host to the container's working directory
