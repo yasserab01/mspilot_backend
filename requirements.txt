@@ -1,12 +1,13 @@
-asgiref == 3.3.1
-Django == 3.1.7
-django-cors-headers == 3.6.0
-djangorestframework == 3.12.2
-djangorestframework-simplejwt == 4.6.0
-PyJWT == 2.1.0
-pytz == 2021.1
-sqlparse == 0.4.1
-psycopg2-binary == 2.8.6
-python-dotenv == 0.15.0
-reportlab == 3.5.59
-gunicorn == 20.0.4
+asgiref==3.3.1
+Django==3.1.7
+django-cors-headers==3.6.0
+djangorestframework==3.12.2
+djangorestframework-simplejwt==4.6.0
+PyJWT==2.1.0
+pytz==2021.1
+sqlparse==0.4.1
+psycopg2-binary==2.8.6
+python-dotenv==0.15.0
+reportlab==3.5.59
+pillow==9.0.0
+gunicorn==20.0.4
