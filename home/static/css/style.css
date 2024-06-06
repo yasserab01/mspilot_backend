@@ -1,0 +1,31 @@
+/* body {
+    font-weight: 620 !important;
+} */
+
+.form-control,
+.form-select {
+    border-radius: 10px !important;
+    border-width: 1px !important;
+}
+
+table.table-bordered {
+    border: solid 3px #0d6efd !important;
+    border-radius: 10px !important;
+}
+
+.card {
+    border-radius: 15px !important;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    background-color: #ffffff !important;
+}
+
+.border-left-decoration {
+    border-left: 3px solid #15a362 !important;
+}
+
+table thead tr th {
+    color: #b5b5c3 !important;
+}
