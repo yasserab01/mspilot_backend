@@ -9,6 +9,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Profile
 from .serializers import UserSerializer, ProfileSerializer
 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -54,7 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         if 'picture' not in request.FILES:
             return Response({'status': 'error', 'message': 'No picture provided'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         profile = user.profile
         profile.picture = request.FILES['picture']
         profile.save()
@@ -67,16 +68,24 @@ class UserViewSet(viewsets.ModelViewSet):
 
         profile, created = Profile.objects.get_or_create(user=user)
 
-        serializer = UserSerializer(user, data=request.data, partial=partial)
+        user_serializer = UserSerializer(user, data=request.data, partial=partial)
         profile_serializer = ProfileSerializer(profile, data=request.data, partial=partial)
 
-        if serializer.is_valid() and profile_serializer.is_valid():
-            serializer.save()
+        user_valid = user_serializer.is_valid()
+        profile_valid = profile_serializer.is_valid()
+
+        if user_valid and profile_valid:
+            user_serializer.save()
             profile_serializer.save()
             return Response({'status': 'success', 'message': 'User updated successfully'})
         else:
-            errors = serializer.errors
-            errors.update(profile_serializer.errors)
+            errors = {}
+            if not user_valid:
+                errors.update(user_serializer.errors)
+                print(f"User serializer errors: {user_serializer.errors}")  # Log user serializer errors
+            if not profile_valid:
+                errors.update(profile_serializer.errors)
+                print(f"Profile serializer errors: {profile_serializer.errors}")  # Log profile serializer errors
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
