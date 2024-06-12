@@ -29,28 +29,34 @@ class ReportViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], url_path='update-subsections-status', url_name='update-subsections-status')
     def update_subsections_status(self, request, pk=None):
-        print(request.data)
+        errors = []
         for subsection_status_data in request.data:
-            subsection_status = SubsectionStatus.objects.get(id=subsection_status_data['id'])
-            subsection_status.status = subsection_status_data['status']
-            subsection_status.justification = subsection_status_data['justification']
-            subsection_status.save()
+            if 'id' not in subsection_status_data or not subsection_status_data['id']:
+                errors.append({'id': subsection_status_data.get('id'), 'error': 'Invalid ID'})
+                continue
+
+            try:
+                subsection_status = SubsectionStatus.objects.get(id=subsection_status_data['id'])
+                subsection_status.status = subsection_status_data['status']
+                subsection_status.justification = subsection_status_data['justification']
+                subsection_status.save()
+            except SubsectionStatus.DoesNotExist:
+                errors.append({'id': subsection_status_data['id'], 'error': 'SubsectionStatus not found'})
+
+        if errors:
+            return Response({'status': 'failure', 'errors': errors}, status=status.HTTP_400_BAD_REQUEST)
+
         return Response({'status': 'success', 'message': 'Subsections status updated successfully'})
 
     @action(detail=True, methods=['post'], url_path='subsections', url_name='subsections')
     def add_subsections(self, request, pk=None):
         report = self.get_object()
-        print(request.data.get('subsections', []))
         for subsection_data in request.data.get('subsections', []):
-            subsection_id = subsection_data['id']
-            subsection_id = subsection_data['id']
-            status = subsection_data['status']
-            justification = subsection_data['justification']
             SubsectionStatus.objects.create(
                 report=report,
-                subsection_id=subsection_id,
-                status=status,
-                justification=justification
+                subsection_id=subsection_data['id'],
+                status=subsection_data['status'],
+                justification=subsection_data['justification']
             )
         return Response({'status': 'success', 'message': 'Subsections added successfully'})
 
