@@ -17,6 +17,7 @@ class UserViewSet(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, FormParser)
 
     def create(self, request, *args, **kwargs):
+        print(f"Request data: {request.data}")
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
