@@ -1,19 +1,22 @@
-from reportlab.lib.units import inch
+from reportlab.pdfbase.pdfmetrics import stringWidth
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from .models import Report, SubsectionStatus
 from .serializers import ReportSerializer, SubsectionStatusSerializer
-from django.http import HttpResponse
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
+from io import BytesIO
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet
-from io import BytesIO
-
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.pdfgen.canvas import Canvas
+from reportlab.lib.utils import simpleSplit
+from django.http import HttpResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from .models import Report
 
 class ReportViewSet(viewsets.ModelViewSet):
     queryset = Report.objects.all()
@@ -102,16 +105,32 @@ class PDFReport(APIView):
         subsection_statuses = {status.subsection.id: status for status in report.subsectionstatus_set.all()}
 
         for section in report.repository.sections.all():
-            data = [[section.name, 'Subsection', 'Status', 'Justification']]
+            data = [[Paragraph("Section", styles['Heading4']),
+                     Paragraph("Subsection", styles['Heading4']),
+                     Paragraph("Status", styles['Heading4']),
+                     Paragraph("Justification", styles['Heading4'])]]
+            column_widths = [1.5 * inch, 1.5 * inch, 1.2 * inch, 3 * inch]  # Predefined column widths
+
             for subsection in section.subsections.all():  # Use the correct related_name
                 status = subsection_statuses.get(subsection.id)
                 if status:
                     subsection_id = f"{section.id}-{subsection.id}"
-                    data.append([subsection_id, subsection.name, status.status, status.justification])
+                    row = [
+                        Paragraph(subsection_id, styles['BodyText']),
+                        Paragraph(subsection.name, styles['BodyText']),
+                        Paragraph(status.status, styles['BodyText']),
+                        Paragraph(status.justification, styles['BodyText'])
+                    ]
                 else:
-                    data.append([subsection.name, 'N/A', 'No data'])
+                    row = [
+                        Paragraph(subsection.name, styles['BodyText']),
+                        Paragraph('N/A', styles['BodyText']),
+                        Paragraph('No data', styles['BodyText']),
+                        ''
+                    ]
+                data.append(row)
 
-            t = Table(data, colWidths=[doc.width / 4.0] * 4)  # Adjust colWidths to match the number of columns
+            t = Table(data, colWidths=column_widths)  # Use predefined column widths
             t.setStyle(table_style)
             Story.append(t)
             Story.append(Spacer(1, 0.2 * inch))

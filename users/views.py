@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
 
 from .models import Profile
 from .serializers import UserSerializer, ProfileSerializer
@@ -14,7 +14,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, JSONParser)
 
     def create(self, request, *args, **kwargs):
         print(f"Request data: {request.data}")
@@ -34,8 +34,9 @@ class UserViewSet(viewsets.ModelViewSet):
                             status=status.HTTP_204_NO_CONTENT)
         return Response({'status': 'error', 'message': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated], url_path='change-password', url_name='change-password', parser_classes=[JSONParser])
     def change_password(self, request, pk=None):
+        print(f"Request data: {request.data}")
         user = self.get_object()
         if user != request.user and not request.user.is_staff:
             return Response({'status': 'error', 'message': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
