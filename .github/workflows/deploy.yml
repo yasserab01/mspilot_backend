@@ -13,6 +13,12 @@ jobs:
       - name: Verify Backend Directory
         run: |
           ls -la
+      - name: Pull Docker Image from Docker Hub
+        run: |
+          docker pull mspilot-backend:latest
+      - name: Verify Pulled Docker Image
+        run: |
+          docker images
       - name: Deploy Backend to Server 
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
