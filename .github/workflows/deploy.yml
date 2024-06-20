@@ -13,7 +13,7 @@ jobs:
       - name: Verify Backend Directory
         run: |
           ls -la
-      - name: Deploy to Heroku Backend
+      - name: Deploy Backend to Server 
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
