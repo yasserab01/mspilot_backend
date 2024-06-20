@@ -1,9 +1,10 @@
 name: Deploy
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Django CI"]
+    types:
+      - completed
 
 jobs:
   pulling-image-from-docker-hub:
