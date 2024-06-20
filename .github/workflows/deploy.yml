@@ -10,14 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
+      
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          
       - name: Pull Docker Image from Docker Hub
         run: |
-          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker pull mspilot-backend:latest
+          docker pull ${{ secrets.DOCKER_USERNAME }}/mspilot-backend:latest
+
       - name: Verify Pulled Docker Image
         run: |
           docker images
+          
       - name: Deploy Backend to Server 
         uses: akhileshns/heroku-deploy@v3.13.15
         with:
